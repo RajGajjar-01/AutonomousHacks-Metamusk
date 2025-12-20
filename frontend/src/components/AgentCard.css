@@ -1,0 +1,337 @@
+.agent-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    transition: var(--transition-fast);
+}
+
+.agent-card:hover {
+    border-color: var(--agent-color);
+}
+
+.agent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.75rem;
+    background: var(--bg-tertiary);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.agent-header:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.agent-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.agent-title h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.agent-icon {
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+    background: linear-gradient(135deg, var(--agent-color), rgba(255, 255, 255, 0.1));
+    border-radius: 4px;
+}
+
+.agent-icon svg {
+    width: 100%;
+    height: 100%;
+    color: white;
+}
+
+.agent-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.execution-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.expand-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+    transition: transform var(--transition-fast);
+}
+
+.expand-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.agent-content {
+    padding: 0.75rem;
+    border-top: 1px solid var(--glass-border);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.agent-stats {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.stat-box {
+    flex: 1;
+    padding: 0.5rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    border: 1px solid transparent;
+}
+
+.stat-box.error {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.stat-box.warning {
+    border-color: rgba(245, 158, 11, 0.3);
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.stat-box.success {
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.stat-box.info {
+    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.stat-text {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.agent-section {
+    margin-bottom: 0.75rem;
+}
+
+.section-heading {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Issue Items - Compact */
+.issue-item {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem;
+    margin-bottom: 0.5rem;
+    border-left: 2px solid;
+}
+
+.issue-item.error {
+    border-left-color: var(--accent-red);
+}
+
+.issue-item.warning {
+    border-left-color: var(--accent-yellow);
+}
+
+.issue-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+    flex-wrap: wrap;
+}
+
+.issue-id {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--accent-cyan);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.issue-type {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+}
+
+.issue-line {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+
+.issue-description {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.issue-suggestion {
+    font-size: 0.75rem;
+    color: var(--accent-green);
+}
+
+/* Change Items - Compact */
+.change-item {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem;
+    margin-bottom: 0.5rem;
+    border-left: 2px solid var(--accent-purple);
+}
+
+.change-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.change-id {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--accent-purple);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.change-type {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+}
+
+.change-line {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+
+.change-diff {
+    background: var(--bg-primary);
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-bottom: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    overflow-x: auto;
+}
+
+.diff-line {
+    padding: 0.15rem 0.3rem;
+    margin: 0.1rem 0;
+    border-radius: 2px;
+}
+
+.diff-line.removed {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--accent-red);
+}
+
+.diff-line.added {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--accent-green);
+}
+
+.change-reason {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.explanation-text {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* Check Items - Compact */
+.check-item {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.check-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.check-status {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: bold;
+}
+
+.check-status.passed {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--accent-green);
+}
+
+.check-status.failed {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--accent-red);
+}
+
+.check-status.warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--accent-yellow);
+}
+
+.check-type {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    text-transform: capitalize;
+}
+
+.check-message {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    padding-left: 1.5rem;
+}
+
+.recommendations-list {
+    padding-left: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.recommendations-list li {
+    margin-bottom: 0.3rem;
+}
