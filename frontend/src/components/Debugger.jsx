@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import Editor from '@monaco-editor/react'
 import { useTheme } from '../contexts/ThemeContext'
 import Navbar from './Navbar'
 import AgentCard from './AgentCard'
 import ResultsPanel from './ResultsPanel'
 import StreamingProgress from './StreamingProgress'
+import CodeEditor from './Editor'
 
 const API_URL = 'http://localhost:8000'
 
@@ -136,39 +136,11 @@ export default function Debugger() {
                             </div>
 
                             {/* Code Editor */}
-                            <div className="flex-1 min-h-[200px] lg:min-h-[400px] rounded-lg overflow-hidden border border-base-content/10">
-                                <Editor
-                                    height="100%"
-                                    language={language === 'cpp' ? 'cpp' : language}
-                                    value={code}
-                                    onChange={(value) => setCode(value || '')}
-                                    theme={theme === 'dark' ? 'vs-dark' : 'light'}
-                                    options={{
-                                        minimap: { enabled: false },
-                                        fontSize: 16,
-                                        lineNumbers: 'on',
-                                        scrollBeyondLastLine: false,
-                                        automaticLayout: true,
-                                        tabSize: 4,
-                                        wordWrap: 'on',
-                                        padding: { top: 8, bottom: 8 },
-                                        folding: true,
-                                        renderLineHighlight: 'all',
-                                        scrollbar: {
-                                            vertical: 'visible',
-                                            horizontal: 'visible',
-                                            useShadows: false,
-                                            verticalScrollbarSize: 8,
-                                            horizontalScrollbarSize: 8
-                                        }
-                                    }}
-                                    loading={
-                                        <div className="flex items-center justify-center h-full bg-base-200">
-                                            <span className="loading loading-spinner loading-lg text-primary"></span>
-                                        </div>
-                                    }
-                                />
-                            </div>
+                            <CodeEditor 
+                                value={code}
+                                onChange={(value) => setCode(value || '')}
+                                language={language}
+                            />
 
                             {/* Context Input - Improved Layout */}
                             <div className="mt-2 lg:mt-3">
@@ -230,7 +202,7 @@ export default function Debugger() {
                         </div>
                     )}
 
-                    {result && !isLoading && <ResultsPanel result={result} />}
+                    {result && !isLoading && <ResultsPanel result={result} language={language} />}
 
                     {!isLoading && !result && !error && !streamingStatus && (
                         <div className="card bg-base-200 shadow-xl flex-1 flex min-h-[200px]">

@@ -45,8 +45,8 @@ const Navbar = () => {
                 </div>
 
                 {/* Brand */}
-                <Link to="/" className="btn btn-ghost text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent hover:bg-transparent tracking-tight pl-0">
-                    MetaMusk
+                <Link to="/" className="font-bold text-2xl hover:bg-transparent">
+                    MetaMusk.ai
                 </Link>
             </div>
 

@@ -23,7 +23,7 @@ function StreamingProgress({ status, agentResults }) {
     ]
 
     const getAgentStatus = (agentName) => {
-        if (agentResults[agentName]) return 'complete'
+        if (agentResults && agentResults[agentName]) return 'complete'
         if (status?.agent === agentName && status?.status === 'working') return 'working'
         if (status?.agent === agentName && status?.status === 'complete') return 'complete'
         return 'pending'

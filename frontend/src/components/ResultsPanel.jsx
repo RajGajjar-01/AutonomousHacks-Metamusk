@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import AgentCard from './AgentCard'
+import CodeEditor from './Editor'
 
-function ResultsPanel({ result }) {
+function ResultsPanel({ result, language }) {
     const [expandedAgents, setExpandedAgents] = useState({
         Scanner: false,
         Fixer: true,
@@ -78,23 +79,28 @@ function ResultsPanel({ result }) {
             )}
 
             {/* Fixed Code Display */}
-            {result.final_code && result.final_code !== result.original_code && (
-                <div className="card bg-base-300 shadow-sm border border-base-content/10">
+            {result.final_code && (
+                <div className="card bg-base-300 shadow-lg border border-success/30">
                     <div className="card-body p-0">
-                        <div className="flex justify-between items-center p-4 bg-base-200 rounded-t-xl border-b border-base-content/10">
-                            <span className="font-bold flex items-center gap-2">
-                                <svg className="w-5 h-5 text-warning" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" /></svg>
+                        <div className="flex justify-between items-center p-4 bg-success/10 rounded-t-xl border-b border-success/20">
+                            <span className="font-bold text-lg flex items-center gap-2">
+                                <svg className="w-6 h-6 text-success" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" /></svg>
                                 Fixed Code
                             </span>
                             <button
-                                className="btn btn-sm btn-ghost"
+                                className="btn btn-sm btn-success"
                                 onClick={() => navigator.clipboard.writeText(result.final_code)}
                             >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                                 Copy
                             </button>
                         </div>
-                        <div className="mockup-code bg-base-100 text-base-content m-0 rounded-t-none">
-                            <pre className="px-5 py-4 overflow-x-auto"><code>{result.final_code}</code></pre>
+                        <div className="min-h-[400px] h-[500px] lg:h-[600px]">
+                            <CodeEditor
+                                value={result.final_code}
+                                language={language}
+                                readOnly={true}
+                            />
                         </div>
                     </div>
                 </div>
