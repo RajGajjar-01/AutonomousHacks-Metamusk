@@ -10,7 +10,6 @@ class Settings(BaseSettings):
     
     # API Keys
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
-    print("GEMINI_API_KEY", gemini_api_key)
     
     # Server Configuration
     host: str = os.getenv("HOST", "0.0.0.0")

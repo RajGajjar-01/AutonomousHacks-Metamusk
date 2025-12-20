@@ -1,23 +1,23 @@
-import './StreamingProgress.css'
+import { useRef, useEffect } from 'react'
 
 function StreamingProgress({ status, agentResults }) {
     const agents = [
         {
             name: 'Scanner',
             icon: '🔍',
-            color: '#3b82f6',
+            color: 'primary',
             description: 'Analyzing code for errors'
         },
         {
             name: 'Fixer',
             icon: '🔧',
-            color: '#8b5cf6',
+            color: 'secondary',
             description: 'Applying fixes'
         },
         {
             name: 'Validator',
             icon: '✓',
-            color: '#10b981',
+            color: 'accent',
             description: 'Validating changes'
         }
     ]
@@ -30,85 +30,66 @@ function StreamingProgress({ status, agentResults }) {
     }
 
     return (
-        <div className="streaming-progress">
-            <div className="progress-header">
-                <div className="pulse-dot"></div>
-                <span className="progress-title">Processing Pipeline</span>
-            </div>
+        <div className="card bg-base-100 shadow-lg border border-base-200">
+            <div className="card-body">
+                <div className="flex items-center gap-2 mb-6">
+                    <span className="loading loading-pulse loading-sm text-primary"></span>
+                    <h3 className="card-title text-base font-bold uppercase tracking-wider text-base-content/70">Processing Pipeline</h3>
+                </div>
 
-            <div className="agents-pipeline">
-                {agents.map((agent, index) => {
-                    const agentStatus = getAgentStatus(agent.name)
-                    const result = agentResults[agent.name]
+                <ul className="steps steps-vertical lg:steps-horizontal w-full">
+                    {agents.map((agent) => {
+                        const agentStatus = getAgentStatus(agent.name)
+                        const result = agentResults[agent.name]
 
-                    return (
-                        <div key={agent.name} className="pipeline-item">
-                            {/* Connector Line */}
-                            {index > 0 && (
-                                <div className={`connector ${agentStatus !== 'pending' ? 'active' : ''}`}>
-                                    <div className="connector-line"></div>
-                                    <div className="connector-arrow">→</div>
-                                </div>
-                            )}
+                        let stepClass = "step"
+                        if (agentStatus === 'complete') stepClass += ` step-${agent.color}`
+                        if (agentStatus === 'working') stepClass += ` step-${agent.color}`
 
-                            {/* Agent Card */}
-                            <div
-                                className={`agent-step ${agentStatus}`}
-                                style={{ '--agent-color': agent.color }}
-                            >
-                                <div className="step-icon">
-                                    {agentStatus === 'working' ? (
-                                        <div className="working-spinner"></div>
-                                    ) : agentStatus === 'complete' ? (
-                                        <span className="complete-check">✓</span>
-                                    ) : (
-                                        <span className="pending-icon">{agent.icon}</span>
-                                    )}
-                                </div>
+                        return (
+                            <li key={agent.name} className={stepClass} data-content={agentStatus === 'complete' ? "✓" : agentStatus === 'working' ? "●" : ""}>
+                                <div className="flex flex-col items-start lg:items-center text-left lg:text-center w-full p-2 gap-1">
+                                    <span className="font-bold text-lg">{agent.name}</span>
 
-                                <div className="step-content">
-                                    <div className="step-header">
-                                        <span className="step-name">{agent.name}</span>
-                                        <span className={`step-status ${agentStatus}`}>
-                                            {agentStatus === 'working' ? 'Working...' :
-                                                agentStatus === 'complete' ? 'Done' : 'Pending'}
-                                        </span>
+                                    <div className="text-sm min-h-[1.5em]">
+                                        {agentStatus === 'working' ? (
+                                            <span className="badge badge-ghost gap-2">
+                                                <span className="loading loading-dots loading-xs"></span>
+                                                Working
+                                            </span>
+                                        ) : agentStatus === 'complete' ? (
+                                            <span className={`badge badge-${agent.color} badge-outline`}>Complete</span>
+                                        ) : (
+                                            <span className="text-base-content/50">Pending</span>
+                                        )}
                                     </div>
 
-                                    <div className="step-description">
+                                    <div className="text-xs text-base-content/70 max-w-[200px] mt-1">
                                         {agentStatus === 'working' && status?.message ? (
-                                            <span className="working-message">{status.message}</span>
+                                            <span className="animate-pulse">{status.message}</span>
                                         ) : result ? (
-                                            <span className="result-preview">
-                                                {agent.name === 'Scanner' && `${result.total_errors || 0} errors, ${result.total_warnings || 0} warnings`}
-                                                {agent.name === 'Fixer' && `${result.total_changes || 0} changes applied`}
-                                                {agent.name === 'Validator' && `${result.validation_status || 'checking'} (${((result.confidence_score || 0) * 100).toFixed(0)}%)`}
+                                            <span className="font-medium">
+                                                {agent.name === 'Scanner' && `${result.total_errors || 0} errors`}
+                                                {agent.name === 'Fixer' && `${result.total_changes || 0} fixes`}
+                                                {agent.name === 'Validator' && `${((result.confidence_score || 0) * 100).toFixed(0)}% conf.`}
                                             </span>
                                         ) : (
-                                            <span className="pending-message">{agent.description}</span>
+                                            agent.description
                                         )}
                                     </div>
                                 </div>
+                            </li>
+                        )
+                    })}
+                </ul>
 
-                                {/* Progress bar for working state */}
-                                {agentStatus === 'working' && (
-                                    <div className="step-progress-bar">
-                                        <div className="progress-fill"></div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )
-                })}
+                {status && (
+                    <div className="alert alert-info bg-base-200/50 mt-6 text-sm py-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>{status.message}</span>
+                    </div>
+                )}
             </div>
-
-            {/* Live status message */}
-            {status && (
-                <div className="live-status">
-                    <div className="status-indicator"></div>
-                    <span>{status.message}</span>
-                </div>
-            )}
         </div>
     )
 }
