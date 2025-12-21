@@ -24,6 +24,7 @@ starlette==0.41.3
 uuid6==2024.1.12
 
 # LangGraph and LangChain
-langgraph==0.2.50
-langchain-core==0.3.21
 langchain==0.3.11
+langchain-core==0.3.24
+langgraph==0.2.50
+
