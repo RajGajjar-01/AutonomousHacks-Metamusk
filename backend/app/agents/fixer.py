@@ -76,6 +76,9 @@ async def fixer_agent(input_data: Dict[str, Any]) -> Dict[str, Any]:
                 
                 # Retry with fallback model
                 fallback_model = get_fallback_model()
+                if fallback_model is None:
+                    logger.error("Fixer - Fallback model not available")
+                    raise e
                 agent_graph = create_agent(
                     model=fallback_model,
                     tools=[],

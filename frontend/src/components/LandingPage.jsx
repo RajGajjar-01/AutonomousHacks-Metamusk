@@ -5,11 +5,6 @@ const LandingPage = () => {
   return (
     <>
       <div className="relative w-full overflow-x-hidden min-h-screen flex flex-col">
-        {/* Gradient Background - Emerging from bottom, covering entire screen */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute bottom-[200px] left-1/2 -translate-x-1/2 w-full max-w-[1400px] h-[900px] bg-gradient-to-t from-primary/20 via-secondary/15 to-transparent blur-[250px] rounded-full"></div>
-        </div>
-
         {/* Content */}
         <div className="relative z-10 flex flex-col items-center justify-center min-h-[80vh] px-4 sm:px-6 md:px-8">
           <div className="text-center max-w-3xl w-full">

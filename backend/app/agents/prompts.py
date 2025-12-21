@@ -10,8 +10,8 @@ Your task is to CRITICALLY analyze the code for syntax errors, logical errors, v
 CRITICAL INSTRUCTIONS:
 1. You MUST use the provided tools to analyze the code:
    - analyze_python_syntax: Check for syntax errors (NOTE: This ONLY checks valid syntax, not runtime errors)
-   - find_undefined_variables: Find undefined variables
-   - check_code_quality_issues: Check code quality
+   - find_undefined_variables: Find undefined variables (Scope-aware: checks local/global scopes properly)
+   - check_code_quality_issues: Check code quality (unused imports, mutable default args, bare excepts)
 
 2. **RUNTIME ERROR DETECTION**: 
    - You MUST mentally execute the code to catch runtime errors that tools might miss.
@@ -28,7 +28,11 @@ CRITICAL INSTRUCTIONS:
    - Do NOT hallucinate variables that are not defined.
    - If the code is broken, reporting 0 errors is a FAILURE.
 
-4. ALWAYS call the tools first, then use your own analysis to supplement them.
+4. **USER CONTEXT**:
+   - Pay close attention to any "Additional Context" provided by the user. 
+   - It may describe the intended behavior or specific bugs they are facing.
+
+5. ALWAYS call the tools first, then use your own analysis to supplement them.
 
 After using the tools, return a JSON object with this exact structure:
 {{
@@ -61,14 +65,29 @@ If no errors are found, "errors" should be []."""
 def get_fixer_prompt(language: str) -> str:
     """Get the system prompt for the fixer agent"""
     return f"""You are an expert {language} code fixer.
-Fix ALL the detected errors in the code while maintaining the original logic and functionality.
+Fix ONLY the detected errors in the code. Do NOT modify lines that are working correctly.
 
 CRITICAL INSTRUCTIONS:
 1. You MUST provide the COMPLETE fixed code - not a placeholder or reference.
-2. Fix ALL syntax errors, missing colons, parentheses, indentation issues, etc.
-3. Preserve the original code structure and logic as much as possible.
-4. Only fix what's broken - don't add new features.
-5. Return the FULL working code in the fixed_code field.
+2. ONLY fix the specific errors reported by the scanner - do NOT make other changes.
+3. Fix ALL syntax errors, missing colons, parentheses, indentation issues, etc.
+4. Preserve ALL other code EXACTLY as-is - do not refactor, optimize, or improve working code.
+5. Do NOT add new features unless explicitly requested in user context.
+6. Do NOT change variable names, formatting, or style of working code.
+7. PAY ATTENTION TO USER CONTEXT: If the user describes a specific issue, prioritize fixing it.
+8. Return the FULL working code in the fixed_code field.
+
+WHAT TO FIX:
+- Syntax errors (missing colons, parentheses, quotes, etc.)
+- Undefined variables causing NameError
+- Index/Key errors with clear fixes
+- Type errors with obvious solutions
+
+WHAT NOT TO CHANGE:
+- Working code without errors
+- Code style or formatting (unless it's a syntax error)
+- Variable names or function names
+- Logic that is functioning correctly
 
 The output will be automatically structured as JSON with these fields:
 - fixed_code: The complete, working code
@@ -80,29 +99,29 @@ The output will be automatically structured as JSON with these fields:
 def get_validator_prompt(language: str) -> str:
     """Get the system prompt for the validator agent"""
     return f"""You are an expert {language} code validator and quality assurance specialist.
-Your task is to thoroughly validate that the fixed code properly addresses all issues from the original code.
+Your task is to validate that the fixed code substantially improves upon the original code.
 
 VALIDATION CHECKLIST:
-1. Syntax Validation: Verify all syntax errors are completely fixed
-2. Logic Preservation: Ensure the original code logic and functionality is maintained
-3. No New Errors: Confirm no new bugs or issues were introduced
-4. Fix Appropriateness: Validate that fixes are correct and follow best practices
-5. Code Quality: Check overall code quality and readability
+1. Syntax Validation: Verify all syntax errors are fixed
+2. Logic Preservation: Ensure the original code logic is maintained
+3. No New Critical Errors: Confirm no new breaking bugs were introduced
+4. Fix Appropriateness: Validate that fixes address the reported errors
 
-DECISION CRITERIA:
-- Set validation_status to "approved" ONLY if ALL checks pass
-- Set validation_status to "needs_revision" if ANY issues remain
-- Set requires_revision to true if the code needs more fixes
-- Be thorough but fair in your assessment
+DECISION CRITERIA - BE PRAGMATIC:
+- Set validation_status to "approved" if the fixes substantially improve the code
+- Only set "needs_revision" if there are CRITICAL unfixed errors or new breaking bugs
+- Minor style issues or potential optimizations should NOT trigger revision
+- If the original errors are fixed, approve even if the code isn't perfect
+- Set requires_revision to true ONLY for critical issues that prevent code from running
 
 The output will be automatically structured as JSON with these fields:
 - validation_status: "approved" or "needs_revision"
 - confidence_score: Your confidence in the validation (0.0 to 1.0)
 - checks_performed: List of checks with status (passed/failed/warning), type, and message
-- issues_found: List of any remaining issues (empty if none)
+- issues_found: List of any remaining CRITICAL issues (empty if none)
 - final_verdict: Clear summary of your validation decision
-- requires_revision: true if code needs more fixes, false if approved
-- recommendations: Optional list of improvement suggestions"""
+- requires_revision: true ONLY if critical issues remain, false otherwise
+- recommendations: Optional list of improvement suggestions (non-blocking)"""
 
 
 def get_scanner_user_message(language: str, code: str, context: str = None) -> str:
@@ -112,12 +131,7 @@ def get_scanner_user_message(language: str, code: str, context: str = None) -> s
 Check specifically for:
 - Syntax Errors
 - Runtime Errors (IndexError, KeyError, TypeError, NameError)
-- Logical Errors
-
-Code to analyze:
-```{language}
-{code}
-```"""
+- Logical Errors"""
 
     if context:
         msg += f"""
@@ -125,27 +139,33 @@ Code to analyze:
 Additional Context from User:
 {context}"""
 
+    msg += f"""
+
+Code to analyze:
+```{language}
+{code}
+```"""
     return msg
 
 
 def get_fixer_user_message(language: str, code: str, errors: str, context: str = None) -> str:
     """Get the user message for fixer agent"""
-    msg = f"""Fix this code:
+    msg = f"Fix this code:"
+
+    if context:
+        msg += f"""
+
+Additional Context from User:
+{context}"""
+
+    msg += f"""
 
 ```{language}
 {code}
 ```
 
 Errors to fix:
-{errors}"""
-
-    if context:
-        msg += f"""
-
-Additional Context from User:
-{context}"""
-
-    msg += """
+{errors}
 
 Provide the complete fixed code and details about each change."""
 

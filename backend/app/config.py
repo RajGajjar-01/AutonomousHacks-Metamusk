@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     gemini_model: str = "models/gemini-2.5-pro"
     groq_model: str = "llama-3.3-70b-versatile"
     groq_api_key: str = os.getenv("GROQ_API_KEY", "")
+    huggingfacehub_api_token: str = os.getenv("HUGGINGFACEHUB_API_TOKEN", "")
     
     # Workflow Configuration
     max_iterations: int = 3

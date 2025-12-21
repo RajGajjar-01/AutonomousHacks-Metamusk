@@ -54,6 +54,10 @@ async def scanner_agent(input_data: Dict[str, Any]) -> Dict[str, Any]:
                 
                 # Retry with fallback model
                 fallback_model = get_fallback_model()
+                if fallback_model is None:
+                    logger.error("Scanner - Fallback model not available")
+                    raise e  # Re-raise original error
+                
                 agent_graph = create_base_agent("Scanner (Fallback)", instruction, tools, fallback_model)
                 
                 result = await agent_graph.ainvoke({
@@ -74,15 +78,53 @@ async def scanner_agent(input_data: Dict[str, Any]) -> Dict[str, Any]:
         
         logger.info(f"Scanner - Response content preview: {response_content[:200]}")
         
-        # Parse JSON
-        if "```json" in response_content:
-            json_text = response_content.split("```json")[1].split("```")[0].strip()
-        elif "```" in response_content:
-             json_text = response_content.split("```")[1].split("```")[0].strip()
-        else:
-            json_text = response_content.strip()
+        # Parse JSON with error handling
+        try:
+            if "```json" in response_content:
+                json_text = response_content.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_content:
+                 json_text = response_content.split("```")[1].split("```")[0].strip()
+            else:
+                json_text = response_content.strip()
             
-        data = json.loads(json_text)
+            # Try to parse JSON
+            try:
+                data = json.loads(json_text)
+            except json.JSONDecodeError as e:
+                logger.warning(f"Scanner - JSON parse error: {e}. Attempting to repair...")
+                # Try to repair common JSON issues
+                # Remove trailing commas, fix quotes
+                json_text_repaired = json_text.replace(",]", "]").replace(",}", "}")
+                try:
+                    data = json.loads(json_text_repaired)
+                    logger.info("Scanner - JSON repaired successfully")
+                except:
+                    # If still fails, log the problematic JSON and return safe defaults
+                    logger.error(f"Scanner - Failed to parse JSON. Content length: {len(json_text)}")
+                    logger.error(f"Scanner - JSON excerpt: {json_text[:500]}...")
+                    raise ValueError(f"Failed to parse scanner response: {str(e)}")
+                    
+        except Exception as parse_error:
+            logger.error(f"Scanner - Parse error: {parse_error}")
+            # Return safe defaults
+            return {
+                "agent_name": "Scanner",
+                "request_id": request_id,
+                "status": "completed",
+                "errors": [],
+                "warnings": [{
+                    "warning_id": "WARN-PARSE",
+                    "type": "ParsingError",
+                    "line": 0,
+                    "description": f"Scanner response parsing failed: {str(parse_error)}"
+                }],
+                "total_errors": 0,
+                "total_warnings": 1,
+                "code_quality_score": 5.0,
+                "analysis_summary": "Scanner completed but response parsing failed. Code may need manual review.",
+                "is_runnable": True,
+                "timestamp": datetime.utcnow().isoformat() + "Z"
+            }
         
         return {
             "agent_name": "Scanner",
