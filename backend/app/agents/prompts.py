@@ -9,24 +9,37 @@ Your task is to CRITICALLY analyze the code for syntax errors, logical errors, v
 
 CRITICAL INSTRUCTIONS:
 1. You MUST use the provided tools to analyze the code:
-   - analyze_python_syntax: Check for syntax errors
+   - analyze_python_syntax: Check for syntax errors (NOTE: This ONLY checks valid syntax, not runtime errors)
    - find_undefined_variables: Find undefined variables
    - check_code_quality_issues: Check code quality
-2. Do NOT identify the code as correct if there are ANY syntax errors (missing colons, parentheses, indentations, etc.).
-3. Do NOT hallucinate variables that are not defined.
-4. If the code is broken, reporting 0 errors is a FAILURE.
-5. ALWAYS call the tools first, then summarize the results.
+
+2. **RUNTIME ERROR DETECTION**: 
+   - You MUST mentally execute the code to catch runtime errors that tools might miss.
+   - Look specifically for:
+     - IndexError: Accessing list/tuple indexes out of bounds (e.g., list[10] when length is 3)
+     - KeyError: Accessing missing keys in dictionaries
+     - NameError: Using variables that are not defined (even if tools miss them)
+     - TypeError: Invalid operations on types
+     - Logic Errors: Infinite loops, incorrect calculations
+
+3. **REPORTING RULES**:
+   - Do NOT identify the code as correct if there are ANY syntax OR runtime errors.
+   - If a tool says "valid syntax" but you see an IndexError, YOU MUST REPORT THE ERROR.
+   - Do NOT hallucinate variables that are not defined.
+   - If the code is broken, reporting 0 errors is a FAILURE.
+
+4. ALWAYS call the tools first, then use your own analysis to supplement them.
 
 After using the tools, return a JSON object with this exact structure:
 {{
     "errors": [
         {{
             "error_id": "ERR-001",
-            "type": "SyntaxError",
+            "type": "RuntimeError", 
             "severity": "high",
             "line": 1,
-            "description": "Short description of error",
-            "suggestion": "How to fix it"
+            "description": "Accessing index 10 of a list with 3 items",
+            "suggestion": "Check list length before accessing index"
         }}
     ],
     "warnings": [
@@ -94,7 +107,17 @@ The output will be automatically structured as JSON with these fields:
 
 def get_scanner_user_message(language: str, code: str) -> str:
     """Get the user message for scanner agent"""
-    return f"Analyze this code rigorously using ALL available tools:\n```{language}\n{code}\n```"
+    return f"""Analyze this code rigorously using ALL available tools.
+    
+Check specifically for:
+- Syntax Errors
+- Runtime Errors (IndexError, KeyError, TypeError, NameError)
+- Logical Errors
+
+Code to analyze:
+```{language}
+{code}
+```"""
 
 
 def get_fixer_user_message(language: str, code: str, errors: str) -> str:

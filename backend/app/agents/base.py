@@ -26,6 +26,20 @@ def GroqChatModel():
         temperature=0.2
     )
 
+def get_fallback_model():
+    """
+    Returns a fallback ChatGroq instance (smaller/faster model)
+    to use when the primary model hits rate limits.
+    """
+    if not settings.groq_api_key:
+        logger.warning("Groq API key missing!")
+        
+    return ChatGroq(
+        api_key=settings.groq_api_key,
+        model="llama-3.1-8b-instant",  # Fallback to smaller model
+        temperature=0.2
+    )
+
 # ============================================================================
 # BASE AGENT FACTORY
 # ============================================================================

@@ -356,10 +356,16 @@ async def finalize_node(state: DebugState) -> Dict[str, Any]:
         # Update metadata
         end_time = datetime.utcnow().isoformat() + "Z"
         current_metadata = state.get("metadata") or {}
-        start_time = current_metadata.get("start_time", end_time)
+        start_time_str = current_metadata.get("start_time", end_time)
         
-        # Calculate total time (simplified)
-        total_time = 0.0  # TODO: Calculate actual time difference
+        # Calculate total time
+        try:
+            start_dt = datetime.fromisoformat(start_time_str.replace("Z", "+00:00"))
+            end_dt = datetime.fromisoformat(end_time.replace("Z", "+00:00"))
+            total_time = round((end_dt - start_dt).total_seconds(), 2)
+        except Exception as e:
+            logger.warning(f"Failed to calculate total_time: {e}")
+            total_time = 0.0
         
         metadata = {
             **current_metadata,

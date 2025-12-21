@@ -195,6 +195,11 @@ async def debug_code_stream(request: DebugRequest):
                     
                     # Check if workflow is complete (either finalize node or status completed)
                     if node_name == "finalize" or state.get("workflow_status") == "completed":
+                        # Calculate total time if metadata is available
+                        metadata = state.get("metadata", {})
+                        total_time = metadata.get("total_time", 0)
+                        iterations = metadata.get("iterations", state.get("iteration", 0))
+                        
                         final_event = {
                             "type": "workflow_complete",
                             "result": {
@@ -202,18 +207,23 @@ async def debug_code_stream(request: DebugRequest):
                                 "success": state.get("success"),
                                 "message": state.get("message"),
                                 "final_code": state.get("final_code") or state.get("fixed_code") or state.get("code"),
+                                "workflow_metadata": {
+                                    "total_time": total_time,
+                                    "iterations": iterations,
+                                    "agents_involved": metadata.get("agents_involved", [])
+                                },
                                 "summary": {
                                     "errors_found": state.get("total_errors", 0),
                                     "errors_fixed": state.get("total_changes", 0),
                                     "validation_score": state.get("validation_result", {}).get("confidence_score", 0) if state.get("validation_result") else 0
                                 },
                                 "scanner_result": {
-                                    "errors": state.get("errors"),
-                                    "warnings": state.get("warnings"),
-                                    "total_errors": state.get("total_errors"),
-                                    "total_warnings": state.get("total_warnings"),
+                                    "errors": state.get("errors", []),
+                                    "warnings": state.get("warnings", []),
+                                    "total_errors": state.get("total_errors", 0),
+                                    "total_warnings": state.get("total_warnings", 0),
                                     "code_quality_score": state.get("code_quality_score")
-                                } if state.get("errors") is not None else None,
+                                } if state.get("total_errors") is not None else None,
                                 "fixer_result": {
                                     "fixed_code": state.get("fixed_code"),
                                     "changes": state.get("fixes"),

@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 
 from app.core.logger import get_logger
-from app.agents.base import create_base_agent, GroqChatModel
+from app.agents.base import create_base_agent, GroqChatModel, get_fallback_model
 from app.agents.prompts import get_scanner_prompt, get_scanner_user_message
 from app.agents.tools.scanner_tools import (
     analyze_python_syntax, 
@@ -29,12 +29,12 @@ async def scanner_agent(input_data: Dict[str, Any]) -> Dict[str, Any]:
         find_undefined_variables,
         check_code_quality_issues
     ]
-    model = GroqChatModel()
     
     # 2. Get System Prompt
     instruction = get_scanner_prompt(language)
 
-    # 3. Create Agent (returns CompiledStateGraph)
+    # 3. Create Agent (initial attempt with primary model)
+    model = GroqChatModel()
     agent_graph = create_base_agent("Scanner", instruction, tools, model)
     
     # 4. Invoke Agent
@@ -42,10 +42,24 @@ async def scanner_agent(input_data: Dict[str, Any]) -> Dict[str, Any]:
         # Get user message
         user_msg = get_scanner_user_message(language, code)
         
-        # Invoke the graph with messages
-        result = await agent_graph.ainvoke({
-            "messages": [{"role": "user", "content": user_msg}]
-        })
+        try:
+            # Invoke the graph with messages
+            result = await agent_graph.ainvoke({
+                "messages": [{"role": "user", "content": user_msg}]
+            })
+        except Exception as e:
+            if "429" in str(e) or "Rate limit" in str(e):
+                logger.warning(f"Scanner - Rate limit hit, switching to fallback model. Error: {e}")
+                
+                # Retry with fallback model
+                fallback_model = get_fallback_model()
+                agent_graph = create_base_agent("Scanner (Fallback)", instruction, tools, fallback_model)
+                
+                result = await agent_graph.ainvoke({
+                    "messages": [{"role": "user", "content": user_msg}]
+                })
+            else:
+                raise e
         
         logger.info(f"Scanner - Agent result keys: {result.keys()}")
         

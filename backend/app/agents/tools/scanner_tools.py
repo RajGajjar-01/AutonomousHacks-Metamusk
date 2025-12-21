@@ -11,11 +11,8 @@ def analyze_python_syntax(code: str) -> str:
     """
     Analyze Python code for syntax errors using AST parsing.
     
-    Args:
-        code: The Python source code to analyze
-    
-    Returns:
-        JSON string with syntax analysis results containing 'valid' and 'errors' fields
+    IMPORTANT: This ONLY checks if the code is syntactically valid (can be parsed).
+    It does NOT check for runtime errors like IndexError, KeyError, TypeError, or logic errors.
     """
     try:
         ast.parse(code)

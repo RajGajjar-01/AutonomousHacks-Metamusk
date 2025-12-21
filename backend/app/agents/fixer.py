@@ -4,7 +4,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 from app.core.logger import get_logger
-from app.agents.base import GroqChatModel
+from app.agents.base import GroqChatModel, get_fallback_model
 from app.agents.prompts import get_fixer_prompt, get_fixer_user_message
 from langchain.agents import create_agent
 
@@ -65,9 +65,28 @@ async def fixer_agent(input_data: Dict[str, Any]) -> Dict[str, Any]:
             response_format=FixerOutput
         )
         
-        result = await agent_graph.ainvoke({
-            "messages": [{"role": "user", "content": user_msg}]
-        })
+        try:
+            result = await agent_graph.ainvoke({
+                "messages": [{"role": "user", "content": user_msg}]
+            })
+        except Exception as e:
+            if "429" in str(e) or "Rate limit" in str(e):
+                logger.warning(f"Fixer - Rate limit hit, switching to fallback model. Error: {e}")
+                
+                # Retry with fallback model
+                fallback_model = get_fallback_model()
+                agent_graph = create_agent(
+                    model=fallback_model,
+                    tools=[],
+                    system_prompt=instruction,
+                    response_format=FixerOutput
+                )
+                
+                result = await agent_graph.ainvoke({
+                    "messages": [{"role": "user", "content": user_msg}]
+                })
+            else:
+                raise e
         
         # Extract structured response
         structured_response = result.get("structured_response")
