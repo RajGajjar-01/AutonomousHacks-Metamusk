@@ -105,9 +105,9 @@ The output will be automatically structured as JSON with these fields:
 - recommendations: Optional list of improvement suggestions"""
 
 
-def get_scanner_user_message(language: str, code: str) -> str:
+def get_scanner_user_message(language: str, code: str, context: str = None) -> str:
     """Get the user message for scanner agent"""
-    return f"""Analyze this code rigorously using ALL available tools.
+    msg = f"""Analyze this code rigorously using ALL available tools.
     
 Check specifically for:
 - Syntax Errors
@@ -119,19 +119,37 @@ Code to analyze:
 {code}
 ```"""
 
+    if context:
+        msg += f"""
 
-def get_fixer_user_message(language: str, code: str, errors: str) -> str:
+Additional Context from User:
+{context}"""
+
+    return msg
+
+
+def get_fixer_user_message(language: str, code: str, errors: str, context: str = None) -> str:
     """Get the user message for fixer agent"""
-    return f"""Fix this code:
+    msg = f"""Fix this code:
 
 ```{language}
 {code}
 ```
 
 Errors to fix:
-{errors}
+{errors}"""
+
+    if context:
+        msg += f"""
+
+Additional Context from User:
+{context}"""
+
+    msg += """
 
 Provide the complete fixed code and details about each change."""
+
+    return msg
 
 
 def get_validator_user_message(language: str, original: str, fixed: str) -> str:

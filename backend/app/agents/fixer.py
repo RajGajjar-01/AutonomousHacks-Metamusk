@@ -33,6 +33,7 @@ async def fixer_agent(input_data: Dict[str, Any]) -> Dict[str, Any]:
     code = input_data.get("original_code")
     scanner_output = input_data.get("scanner_output", {})
     language = input_data.get("language", "python")
+    context = input_data.get("context")
 
     errors = scanner_output.get("errors", [])
     if not errors:
@@ -53,7 +54,7 @@ async def fixer_agent(input_data: Dict[str, Any]) -> Dict[str, Any]:
         error_context = json.dumps(errors, indent=2)
         
         # Get user message
-        user_msg = get_fixer_user_message(language, code, error_context)
+        user_msg = get_fixer_user_message(language, code, error_context, context)
         
         logger.info(f"Creating Fixer agent using create_agent with structured output")
         

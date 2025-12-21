@@ -131,6 +131,7 @@ async def fixer_node(state: DebugState) -> Dict[str, Any]:
         errors = state.get("errors", [])
         language = state["language"]
         request_id = state["request_id"]
+        context = state.get("context", "")
         
         # Prepare scanner output for fixer
         scanner_output = {
@@ -145,7 +146,8 @@ async def fixer_node(state: DebugState) -> Dict[str, Any]:
             "request_id": request_id,
             "original_code": code,
             "language": language,
-            "scanner_output": scanner_output
+            "scanner_output": scanner_output,
+            "context": context
         })
         
         # Extract results

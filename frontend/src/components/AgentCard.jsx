@@ -61,7 +61,7 @@ function AgentCard({ agent, data, isExpanded, onToggle }) {
 
   const renderScannerContent = () => (
     <div className="grid gap-4">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 items-center">
         <div className="badge badge-error gap-2 p-3">
           <span className="font-bold">{data.total_errors || 0}</span> Errors
         </div>
@@ -74,27 +74,34 @@ function AgentCard({ agent, data, isExpanded, onToggle }) {
       </div>
 
       {data.errors?.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="font-bold text-sm uppercase opacity-70">Errors Found</h4>
+        <div className="space-y-3">
+          <h4 className="font-bold text-sm uppercase opacity-70 tracking-wider">Errors Found</h4>
           {data.errors.map((error, idx) => (
             <div
               key={idx}
-              className="alert alert-error shadow-sm text-sm py-2 px-3 items-start flex-col sm:flex-row gap-2"
+              className="card bg-base-100 shadow-sm border border-base-content/10 overflow-hidden group"
             >
-              <div className="flex gap-2 w-full sm:w-auto items-center">
-                <span className="badge badge-sm badge-outline font-mono opacity-75">
-                  {error.error_id}
-                </span>
-                <span className="badge badge-sm badge-white font-mono opacity-75">
-                  Line {error.line}
-                </span>
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold">{error.type}</p>
-                <p className="opacity-90">{error.description}</p>
-                {error.suggestion && (
-                  <p className="mt-1 text-xs bg-white/10 p-2 rounded">💡 {error.suggestion}</p>
-                )}
+              <div className="flex flex-col sm:flex-row gap-3 p-4">
+                <div className="flex items-start gap-2 min-w-[100px]">
+                  <span className="badge badge-sm badge-error badge-outline font-mono opacity-80 mt-0.5">
+                    Line {error.line}
+                  </span>
+                  {error.error_id && (
+                    <span className="text-xs font-mono opacity-50 hidden sm:inline-block">{error.error_id}</span>
+                  )}
+                </div>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-baseline justify-between">
+                    <span className="font-bold text-error">{error.type}</span>
+                    <span className="text-xs font-mono uppercase opacity-50 border border-current px-1 rounded">{error.severity || 'high'}</span>
+                  </div>
+                  <p className="opacity-90 leading-relaxed text-sm">{error.description}</p>
+                  {error.suggestion && (
+                    <div className="mt-2 text-xs bg-base-200/50 p-2 rounded border-l-2 border-info/50 text-base-content/80">
+                      <span className="font-bold text-info mr-1">Fix:</span> {error.suggestion}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -102,21 +109,22 @@ function AgentCard({ agent, data, isExpanded, onToggle }) {
       )}
 
       {data.warnings?.length > 0 && (
-        <div className="space-y-2 mt-2">
-          <h4 className="font-bold text-sm uppercase opacity-70">Warnings</h4>
+        <div className="space-y-3 mt-2">
+          <h4 className="font-bold text-sm uppercase opacity-70 tracking-wider">Warnings</h4>
           {data.warnings.map((warning, idx) => (
             <div
               key={idx}
-              className="alert alert-warning shadow-sm text-sm py-2 px-3 items-start flex-col gap-1"
+              className="card bg-base-100 shadow-sm border border-warning/20 overflow-hidden"
             >
-              <div className="flex gap-2 w-full items-center">
-                <span className="badge badge-sm badge-outline font-mono opacity-75">
-                  {warning.warning_id}
-                </span>
-                <span className="badge badge-sm font-mono opacity-75">Line {warning.line}</span>
-                <span className="font-bold">{warning.type}</span>
+              <div className="flex gap-3 p-3 items-start">
+                <div className="min-w-[80px]">
+                  <span className="badge badge-sm badge-warning badge-outline font-mono">Line {warning.line}</span>
+                </div>
+                <div className="flex-1">
+                  <div className="font-bold text-warning text-sm mb-1">{warning.type}</div>
+                  <p className="text-sm opacity-80">{warning.description}</p>
+                </div>
               </div>
-              <p className="opacity-90">{warning.description}</p>
             </div>
           ))}
         </div>
@@ -126,32 +134,39 @@ function AgentCard({ agent, data, isExpanded, onToggle }) {
 
   const renderFixerContent = () => (
     <div className="grid gap-4">
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         <div className="badge badge-success gap-2 p-3">
           <span className="font-bold">{data.total_changes || 0}</span> Changes applied
         </div>
+        {data.total_changes > 0 && (
+          <span className="text-xs opacity-50 ml-1">
+            {(data.confidence_score * 100).toFixed(0)}% Confidence
+          </span>
+        )}
       </div>
 
       {data.changes?.length > 0 && (
-        <div className="space-y-3">
-          <h4 className="font-bold text-sm uppercase opacity-70">Changes Made</h4>
+        <div className="space-y-4">
+          <h4 className="font-bold text-sm uppercase opacity-70 tracking-wider">Changes Made</h4>
           {data.changes.map((change, idx) => (
-            <div key={idx} className="card bg-base-200 compact border border-base-300">
-              <div className="card-body p-3">
-                <div className="flex gap-2 items-center mb-2">
-                  <span className="badge badge-sm badge-ghost">Line {change.line_number}</span>
+            <div key={idx} className="card bg-base-100 shadow-sm border border-base-content/10 overflow-hidden group">
+              <div className="px-4 py-2 bg-base-200/50 border-b border-base-content/10 flex justify-between items-center">
+                <div className="badge badge-sm badge-neutral font-mono rounded">Line {change.line_number}</div>
+                <div className="text-xs opacity-50 italic group-hover:opacity-100 transition-opacity">
+                  {change.reason}
                 </div>
-                <div className="mockup-code bg-base-300 text-xs p-0 min-w-0">
-                  {change.original && (
-                    <pre className="text-error bg-error/10 block px-4 py-1">
-                      <code>- {change.original}</code>
-                    </pre>
-                  )}
-                  <pre className="text-success bg-success/10 block px-4 py-1">
-                    <code>+ {change.fixed}</code>
-                  </pre>
+              </div>
+              <div className="font-mono text-sm leading-6">
+                {change.original && (
+                  <div className="bg-error/10 text-error px-4 py-1 border-b border-error/5 flex gap-3 select-none">
+                    <span className="w-4 inline-block text-center opacity-50">-</span>
+                    <span className="select-text">{change.original}</span>
+                  </div>
+                )}
+                <div className="bg-success/10 text-success px-4 py-1 flex gap-3">
+                  <span className="w-4 inline-block text-center opacity-50">+</span>
+                  <span>{change.fixed}</span>
                 </div>
-                <p className="text-xs mt-2 italic opacity-70">{change.reason}</p>
               </div>
             </div>
           ))}
@@ -160,8 +175,8 @@ function AgentCard({ agent, data, isExpanded, onToggle }) {
 
       {data.explanation && (
         <div className="mt-2">
-          <h4 className="font-bold text-sm uppercase opacity-70 mb-1">Explanation</h4>
-          <p className="text-sm opacity-90 leading-relaxed bg-base-200 p-3 rounded-lg">
+          <h4 className="font-bold text-sm uppercase opacity-70 mb-2 tracking-wider">Summary</h4>
+          <p className="text-sm opacity-80 leading-relaxed bg-base-100 border border-base-content/5 p-4 rounded-xl">
             {data.explanation}
           </p>
         </div>

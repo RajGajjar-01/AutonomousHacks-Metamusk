@@ -20,6 +20,7 @@ async def scanner_agent(input_data: Dict[str, Any]) -> Dict[str, Any]:
     request_id = input_data.get("request_id")
     code = input_data.get("code")
     language = input_data.get("language", "python")
+    context = input_data.get("context")
     
     logger.info(f"Scanner Agent - Processing request {request_id}")
     
@@ -40,7 +41,7 @@ async def scanner_agent(input_data: Dict[str, Any]) -> Dict[str, Any]:
     # 4. Invoke Agent
     try:
         # Get user message
-        user_msg = get_scanner_user_message(language, code)
+        user_msg = get_scanner_user_message(language, code, context)
         
         try:
             # Invoke the graph with messages

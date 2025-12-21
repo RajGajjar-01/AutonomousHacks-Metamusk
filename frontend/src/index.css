@@ -32,7 +32,7 @@
 [data-theme='dark'],
 [data-theme='dim'] {
   --color-primary: oklch(65.659% 0.23217 305.451);
-  --color-primary-content: #000000;
+  --color-primary-content: #ffffff;
   --color-base-100: #111111;
   --color-base-200: #1f1f1f;
   --color-base-300: #1f1f1f;
@@ -64,4 +64,23 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.5s ease forwards;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-base-content), transparent 80%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-base-content), transparent 60%);
 }
