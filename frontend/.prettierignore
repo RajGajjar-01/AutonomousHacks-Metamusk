@@ -1,0 +1,17 @@
+node_modules
+
+dist
+dist-ssr
+
+coverage
+
+.vite
+
+*.log
+
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+.env
+.env.*

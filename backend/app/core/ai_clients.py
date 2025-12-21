@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 import httpx
 from app.config import get_settings
-from app.utils.logger import get_logger
+from app.core.logger import get_logger
 
 settings = get_settings()
 logger = get_logger()
@@ -97,4 +97,3 @@ class GeminiClient(BaseAIClient):
 # Singleton instances
 gemini_client = GeminiClient()
 groq_client = GroqClient()
-

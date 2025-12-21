@@ -1,6 +1,10 @@
-# Agents Package
-from app.agents.scanner_agent import ScannerAgent
-from app.agents.fixer_agent import FixerAgent
-from app.agents.validator_agent import ValidatorAgent
+# Agents Package - Optimized structure
+from app.agents.scanner import scanner_agent
+from app.agents.fixer import fixer_agent
+from app.agents.validator import validator_agent
 
-__all__ = ["ScannerAgent", "FixerAgent", "ValidatorAgent"]
+__all__ = [
+    "scanner_agent",
+    "fixer_agent",
+    "validator_agent"
+]
