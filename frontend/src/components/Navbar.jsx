@@ -49,8 +49,8 @@ const Navbar = () => {
         </div>
 
         {/* Brand */}
-        <Link to="/" className="font-bold text-lg sm:text-xl md:text-2xl hover:bg-transparent ml-2 sm:ml-0">
-          MetaMusk.ai
+        <Link to="/" className="font-bold text-lg sm:text-xl md:text-2xl text-gradient hover:bg-transparent ml-2 sm:ml-0">
+          MetaMusk.AI
         </Link>
       </div>
 
@@ -63,8 +63,8 @@ const Navbar = () => {
               <Link
                 to={link.path}
                 className={`px-3 md:px-4 py-2 rounded-lg transition-colors text-sm md:text-base ${location.pathname === link.path
-                    ? 'bg-primary/10 text-primary font-bold'
-                    : 'hover:bg-base-200 text-base-content/80 hover:text-base-content'
+                  ? 'bg-primary/10 text-primary font-bold'
+                  : 'hover:bg-base-200 text-base-content/80 hover:text-base-content'
                   }`}
               >
                 {link.name}
